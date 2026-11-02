@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>REICHSFORSCHUNGSRAT // REFERAT II-D (PLANUM) - 1937</title>
+<style>
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000000;
+    color: #00ff00;
+    font-family: "Courier New", Courier, monospace;
+}
+
+#secret-terminal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #000000;
+    color: #00ff00;
+    z-index: 1;
+    overflow-y: auto;
+    padding: 20px;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.term-box {
+    border: 3px double #00ff00;
+    padding: 15px;
+    background-color: #051005;
+    margin-bottom: 20px;
+}
+
+.segment-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 25px 0;
+    flex-wrap: wrap;
+}
+
+.digit-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #000000;
+    border: 3px inset #444444;
+    padding: 12px 10px;
+}
+
+.display-7seg {
+    position: relative;
+    width: 90px;
+    height: 154px;
+    background: #0a0505;
+    border: 2px solid #222222;
+    user-select: none;
+}
+
+.seg {
+    position: absolute;
+    background-color: #200808;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.seg:hover {
+    background-color: #551515 !important;
+}
+
+.seg.on {
+    background-color: #ff0000 !important;
+    box-shadow: 0 0 10px #ff0000 !important;
+}
+
+.seg-a { top: 6px; left: 18px; width: 54px; height: 12px; }
+.seg-b { top: 16px; right: 6px; width: 12px; height: 56px; }
+.seg-c { top: 82px; right: 6px; width: 12px; height: 56px; }
+.seg-d { bottom: 6px; left: 18px; width: 54px; height: 12px; }
+.seg-e { top: 82px; left: 6px; width: 12px; height: 56px; }
+.seg-f { top: 16px; left: 6px; width: 12px; height: 56px; }
+.seg-g { top: 71px; left: 18px; width: 54px; height: 12px; }
+
+.status-box {
+    margin: 15px auto;
+    max-width: 650px;
+    padding: 10px 15px;
+    font-size: 13px;
+    font-weight: bold;
+    text-align: center;
+    border: 2px solid #444444;
+    background: #000000;
+}
+.status-idle {
+    border-color: #444444;
+    color: #888888;
+}
+.status-error {
+    border-color: #ff0000;
+    color: #ff0000;
+    background: #200000;
+}
+.status-success {
+    border-color: #00ff00;
+    color: #00ff00;
+    background: #002000;
+}
+
+#public-layer {
+    position: relative;
+    z-index: 10;
+    background-color: #c0c0c0;
+    min-height: 100vh;
+    color: #000000;
+    font-family: "Times New Roman", Times, serif;
+    padding: 10px;
+}
+
+.win-titlebar {
+    background: #800000;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    padding: 3px 6px;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.gov-banner {
+    background-color: #ffffff;
+    border: 2px solid #000000;
+    padding: 10px 15px;
+    margin-top: 4px;
+}
+
+.gov-title {
+    font-size: 26px;
+    font-weight: bold;
+    color: #800000;
+    font-family: "Times New Roman", Times, serif;
+    letter-spacing: 1px;
+}
+
+.gov-sub {
+    font-size: 13px;
+    color: #333333;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+}
+
+.ticker-wrap {
+    background: #ffffcc;
+    border: 1px solid #000000;
+    padding: 2px 5px;
+    margin-top: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    color: #800000;
+    font-weight: bold;
+}
+
+.layout-tbl {
+    width: 100%;
+    margin-top: 6px;
+    border-collapse: collapse;
+}
+
+.side-cell {
+    width: 230px;
+    vertical-align: top;
+    background-color: #d4d0c8;
+    border: 2px inset #ffffff;
+    padding: 10px;
+}
+
+.main-cell {
+    vertical-align: top;
+    background-color: #ffffff;
+    border: 2px inset #ffffff;
+    padding: 15px 20px;
+}
+
+.win-btn {
+    display: block;
+    width: 100%;
+    margin-bottom: 6px;
+    padding: 6px 8px;
+    background: #c0c0c0;
+    border: 2px outset #ffffff;
+    color: #000000;
+    font-family: Arial, sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    text-align: left;
+    cursor: pointer;
+    text-decoration: none;
+}
+.win-btn:active {
+    border: 2px inset #ffffff;
+    background: #a0a0a0;
+}
+.win-btn.danger {
+    color: #800000;
+}
+
+.content-box {
+    border: 1px solid #808080;
+    background-color: #fdfdfd;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+}
+
+.content-head {
+    background-color: #800000;
+    color: #ffffff;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 4px 8px;
+    margin: -12px -15px 10px -15px;
+    letter-spacing: 1px;
+}
+
+.log-item {
+    border: 1px solid #a0a0a0;
+    background-color: #ffffff;
+    padding: 10px;
+    margin-bottom: 12px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.log-title {
+    background-color: #e0e0e0;
+    border-bottom: 1px solid #808080;
+    padding: 3px 6px;
+    font-weight: bold;
+    color: #800000;
+    margin-bottom: 6px;
+}
+
+.raw-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    margin-top: 10px;
+}
+.raw-table th, .raw-table td {
+    border: 1px solid #000000;
+    padding: 5px 8px;
+    text-align: left;
+}
+.raw-table th {
+    background-color: #d4d0c8;
+}
+
+.download-box {
+    border: 2px solid #000080;
+    background-color: #f0f4ff;
+    padding: 12px;
+    margin: 12px 0;
+}
+
+.counter-box {
+    display: inline-block;
+    background-color: #000000;
+    color: #00ff00;
+    font-family: "Courier New", monospace;
+    font-size: 14px;
+    padding: 2px 8px;
+    border: 2px inset #ffffff;
+    letter-spacing: 2px;
+}
+
+#screamer-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+}
+
+#screamer-window {
+    width: 580px;
+    background: #c0c0c0;
+    border: 3px outset #ffffff;
+}
+
+#screamer-canvas {
+    width: 100%;
+    height: 360px;
+    background: #000000;
+    position: relative;
+    overflow: hidden;
+}
+
+#jumpscare-fullscreen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    z-index: 1000000;
+    overflow: hidden;
+}
+
+.shaking {
+    animation: violentShake 0.06s infinite alternate;
+}
+
+@keyframes violentShake {
+    0% { transform: translate(-18px, -12px) scale(1.12) rotate(-3deg); filter: invert(0) contrast(3); }
+    50% { transform: translate(18px, 16px) scale(1.2) rotate(3deg); filter: invert(1) saturate(4); }
+    100% { transform: translate(-12px, 12px) scale(1.08) rotate(0deg); filter: invert(0) hue-rotate(140deg); }
+}
+
+.scary-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: Arial, sans-serif;
+    font-size: 46px;
+    font-weight: bold;
+    color: #ff0000;
+    text-shadow: 0 0 25px #ffffff, 0 0 50px #ff0000;
+    text-align: center;
+    width: 90%;
+    pointer-events: none;
+}
+</style>
+</head>
+<body>
+
+<div id="secret-terminal">
+    <div class="term-box">
+        <div style="font-size: 18px; font-weight: bold;">
+            [RECHNERKONTROLLPULT HARZ-II // VERSUCHSSTATION BROCKEN 1937]
+        </div>
+        <div style="font-size: 12px; color: #aaffaa; margin-top: 4px;">
+            DIREKTER ZUGRIFF AUF DAS PLANARE SPEICHERFELD // SPERRSCHICHT AKTIV
+        </div>
+        <p style="font-size: 12px; color: #ffff00; margin-top: 8px;">
+            WARNUNG: DIE ARCHIVDATEIEN SIND MIT DEM 5-STELLIGEN 7-SEGMENT-KODEX DER SPHERELAND-RESONANZ GESICHERT.<br>
+            KLICKEN SIE DIREKT AUF DIE SEGMENT-BALKEN, UM DIE MATRIX MANUELL ZU SCHALTEN.
+        </p>
+    </div>
+
+    <div style="text-align: center; margin: 15px 0;">
+        <span style="color: #ff3333; font-weight: bold; font-size: 13px;">
+            [ 7-SEGMENT-SCHALTMATRIX: 5 FELDER (KLICK ZUM SCHALTEN) ]
+        </span>
+    </div>
+
+    <div class="segment-container" id="lock-container">
+        <div class="digit-wrapper">
+            <span style="color: #888; font-size: 11px; margin-bottom: 6px;">FELD 1</span>
+            <div class="display-7seg" id="seg-display-0">
+                <div class="seg seg-a" data-seg="a"></div>
+                <div class="seg seg-b" data-seg="b"></div>
+                <div class="seg seg-c" data-seg="c"></div>
+                <div class="seg seg-d" data-seg="d"></div>
+                <div class="seg seg-e" data-seg="e"></div>
+                <div class="seg seg-f" data-seg="f"></div>
+                <div class="seg seg-g" data-seg="g"></div>
+            </div>
+        </div>
+
+        <div class="digit-wrapper">
+            <span style="color: #888; font-size: 11px; margin-bottom: 6px;">FELD 2</span>
+            <div class="display-7seg" id="seg-display-1">
+                <div class="seg seg-a" data-seg="a"></div>
+                <div class="seg seg-b" data-seg="b"></div>
+                <div class="seg seg-c" data-seg="c"></div>
+                <div class="seg seg-d" data-seg="d"></div>
+                <div class="seg seg-e" data-seg="e"></div>
+                <div class="seg seg-f" data-seg="f"></div>
+                <div class="seg seg-g" data-seg="g"></div>
+            </div>
+        </div>
+
+        <div class="digit-wrapper">
+            <span style="color: #888; font-size: 11px; margin-bottom: 6px;">FELD 3</span>
+            <div class="display-7seg" id="seg-display-2">
+                <div class="seg seg-a" data-seg="a"></div>
+                <div class="seg seg-b" data-seg="b"></div>
+                <div class="seg seg-c" data-seg="c"></div>
+                <div class="seg seg-d" data-seg="d"></div>
+                <div class="seg seg-e" data-seg="e"></div>
+                <div class="seg seg-f" data-seg="f"></div>
+                <div class="seg seg-g" data-seg="g"></div>
+            </div>
+        </div>
+
+        <div class="digit-wrapper">
+            <span style="color: #888; font-size: 11px; margin-bottom: 6px;">FELD 4</span>
+            <div class="display-7seg" id="seg-display-3">
+                <div class="seg seg-a" data-seg="a"></div>
+                <div class="seg seg-b" data-seg="b"></div>
+                <div class="seg seg-c" data-seg="c"></div>
+                <div class="seg seg-d" data-seg="d"></div>
+                <div class="seg seg-e" data-seg="e"></div>
+                <div class="seg seg-f" data-seg="f"></div>
+                <div class="seg seg-g" data-seg="g"></div>
+            </div>
+        </div>
+
+        <div class="digit-wrapper">
+            <span style="color: #888; font-size: 11px; margin-bottom: 6px;">FELD 5</span>
+            <div class="display-7seg" id="seg-display-4">
+                <div class="seg seg-a" data-seg="a"></div>
+                <div class="seg seg-b" data-seg="b"></div>
+                <div class="seg seg-c" data-seg="c"></div>
+                <div class="seg seg-d" data-seg="d"></div>
+                <div class="seg seg-e" data-seg="e"></div>
+                <div class="seg seg-f" data-seg="f"></div>
+                <div class="seg seg-g" data-seg="g"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="lock-status-box" class="status-box status-idle">
+        [ SYSTEM-STATUS: BEREIT // 5 SEGMENT-FELDER ERFORDERLICH ]
+    </div>
+
+    <div style="text-align: center; margin-top: 15px;">
+        <button onclick="checkLockCode()" style="background: #003300; color: #00ff00; border: 2px outset #00ff00; padding: 10px 24px; font-family: monospace; font-size: 14px; font-weight: bold; cursor: pointer;">
+            [ SCHLEUSE ENTSPERREN // VERIFY CODE ]
+        </button>
+        <button onclick="resetAllSegments()" style="background: #330000; color: #ff6666; border: 2px outset #ff6666; padding: 10px 18px; font-family: monospace; font-size: 13px; margin-left: 12px; cursor: pointer;">
+            [ NULLSTELLUNG ]
+        </button>
+    </div>
+
+    <div id="unlocked-archive" style="display: none; margin-top: 30px;">
+    </div>
+</div>
+
+<div id="public-layer">
+
+    <div class="win-titlebar">
+        <span>GEHEIME REICHSSACHE // REICHSFORSCHUNGSRAT REFERAT II-D (1937)</span>
+        <span>AKTE: RFR-1884-PL-37</span>
+    </div>
+
+    <div class="gov-banner">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                    <div class="gov-title">REICHSFORSCHUNGSRAT</div>
+                    <div class="gov-sub">SONDERREFERAT II-D (PLANUM) // FORSCHUNGSSTATION HARZ-BROCKEN</div>
+                    <div style="font-size: 12px; color: #555555; margin-top: 3px;">
+                        Zentralarchiv Göttingen // Geheime Kommandosache // Bestandsjahr 1937
+                    </div>
+                </td>
+                <td align="right" width="180">
+                    <div style="border: 2px solid #800000; padding: 6px 10px; text-align: center; background: #fff0f0; color: #800000; font-weight: bold; font-size: 11px;">
+                        VERSCHLUSSSACHE<br>
+                        STRENG GEHEIM<br>
+                        BELEG-NR. 042 / 1937
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="ticker-wrap">
+        <marquee behavior="scroll" direction="left" scrollamount="4">
+            +++ BEKANNTMACHUNG: TIEFENSTOLLEN BROCKEN II WEGEN RAUMKRUEMMUNGS-ZWISCHENFALL VERSIEGELT +++ ARCHIVBESTAND 1937 DIGITALISIERT +++
+        </marquee>
+    </div>
+
+    <table class="layout-tbl" cellpadding="0" cellspacing="0">
+        <tr>
+            <td class="side-cell">
+                <div style="font-family: Arial; font-size: 11px; font-weight: bold; color: #333333; margin-bottom: 6px;">
+                    DOKUMENTEN-INDEX
+                </div>
+
+                <button class="win-btn" onclick="showPublicSection('uebersicht')">
+                    [ 01 // UEBERSICHT ]
+                </button>
+                <button class="win-btn" onclick="showPublicSection('logbuecher')">
+                    [ 02 // LOGBUECHER 1937 ]
+                </button>
+                <button class="win-btn" onclick="showPublicSection('messprotokolle')">
+                    [ 03 // MESSPROTOKOLLE ]
+                </button>
+                <button class="win-btn danger" onclick="openScreamerModal()">
+                    [ 04 // SENSORIK (KAMERA) ]
+                </button>
+                <button class="win-btn" onclick="showPublicSection('archivdateien')">
+                    [ 05 // DOWNLOAD (ZIP) ]
+                </button>
+                <button class="win-btn" onclick="showPublicSection('vorschriften')">
+                    [ 06 // DIENSTANWEISUNG ]
+                </button>
+
+                <hr size="1" color="#808080" style="margin: 20px 0;">
+
+                <div style="text-align: center; margin-top: 10px;">
+                    <div style="font-size: 10px; font-family: Arial; color: #333333;">BESUCHERZAEHLER:</div>
+                    <div class="counter-box">004192</div>
+                    <div style="font-size: 9px; color: #666666; margin-top: 6px;">
+                        Optimiert fuer Netscape 3.0 / 800x600
+                    </div>
+                </div>
+
+                <div style="margin-top: 35px; text-align: center;">
+                    <span style="color: #999999; font-size: 9px; cursor: pointer;" onclick="document.getElementById('public-layer').style.display='none'">
+                        [Sperrschicht-Bypass]
+                    </span>
+                </div>
+            </td>
+
+            <td class="main-cell">
+
+                <div id="sec-uebersicht" class="content-box">
+                    <div class="content-head">
+                        REFERAT II-D: UNTERSUCHUNG DES ZWEIDIMENSIONALEN KONTINUUMS
+                    </div>
+                    <p style="font-size: 13px; line-height: 1.5; color: #000000;">
+                        Das Referat II-D (*Planum*) wurde im Fruehjahr 1937 mit der messtechnischen Erforschung
+                        nicht-euklidischer Grenzzonen im Granitmassiv des Brockens beauftragt. Ziel der Versuchsreihe war
+                        die Erzeugung einer makroskopischen Grenzschicht mit der Dicke Z = 0 unter Einsatz hochreiner Wismut-Kristallgitter.
+                    </p>
+                    <p style="font-size: 13px; line-height: 1.5; color: #000000;">
+                        Die Experimente fuehrten zur Entdeckung einer kohaerenten zweidimensionalen Raumzeit, welche von
+                        intelligenten polygonalen Entitaeten bewohnt wird (Referenz: Edwin A. Abbott, London 1884).
+                        Aufgrund unkontrollierbarer Scherkraefte und der Instabilitaet des dreidimensionalen Umfelds
+                        wurde der Versuchsbetrieb am 14. Oktober 1937 durch Sprengung der Stollenmundloecher beendet.
+                    </p>
+                    
+                    <div style="border: 1px dashed #800000; background: #fff8f8; padding: 12px; margin: 15px 0;">
+                        <div style="font-family: Arial; font-weight: bold; font-size: 11px; color: #800000; margin-bottom: 5px;">
+                            VERSCHLUSSSACHE // DIREKTIVE ZUR SYSTEM-VERIFIKATION:
+                        </div>
+                        <div style="font-size: 12px; color: #222222; line-height: 1.45;">
+                            Der fuenfstellige Freigabe-Kodex des Notfall-Terminals repraesentiert das fundamentale Subjekt
+                            unserer Forschung: die im Stollen manifestierte mathematische Raumform.
+                            Die fuenf Chiffren-Glieder sind ueber die Abschnitte dieser Akte dezentral registriert:
+                            <br>
+                            <b>Chiffren-Knoten I:</b> Die Anfangs-Glyphe unserer Grenzwelt («E»).
+                        </div>
+                    </div>
+
+                    <p style="font-size: 12px; line-height: 1.4; color: #555555;">
+                        Die weiteren Schluessel-Segmente sind in den jeweiligen Dossier-Sektionen (Logbuecher, Messprotokolle,
+                        Sensorik und Vorschriften) gemaess Dienstanweisung 37/B vermerkt.
+                    </p>
+                </div>
+
+                <div id="sec-logbuecher" class="content-box" style="display: none;">
+                    <div class="content-head">
+                        ORIGINAL-LOGBUECHER DER FORSCHUNGSGRUPPE PLANUM (1937)
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-title">
+                            LOGBUCH-EINTRAG 01 // 12. AUGUST 1937 // DR. ALBRECHT WEBER
+                        </div>
+                        Das Wismut-Interferometer Modell G-37 im Tiefenstollen Brocken II hat heute erstmals eine stehende
+                        Interferenzwelle stabilisiert. Die Schnittdicke betraegt exakt null Aengstroem. Beim Einfuehren eines
+                        Stahlstabes wurde dieser auf atomarer Ebene getrennt — ohne Spaene, ohne Hitzeentwicklung.
+                        Die planare Grenzzone verhaelt sich wie eine unendlich scharfe Klinge im dreidimensionalen Raum.
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-title">
+                            LOGBUCH-EINTRAG 02 // 14. SEPTEMBER 1937 // PROF. DR. KLAUS BECKER
+                        </div>
+                        Visuelle Beobachtung bestaetigt: Auf der fluoreszierenden Auffangplatte manifestieren sich
+                        Liniensegmente und regulaere Polygone. Die Wesen kommunizieren durch rhythmische Kontraktion
+                        ihrer Kanten. Wir beobachten die Kastenordnung von Abbott: Dreiecke (Soldaten), Quadrate (Gelehrte)
+                        und den sogenannten Priesterkreis.
+                        <br><br>
+                        <i>Signal-Beobachtung an der Grenzflaeche:</i><br>
+                        In der zweiten Phase ordneten sich die planaren Linien waehrend der Interferenz zu einer
+                        charakteristischen geometrischen Signatur an — exakt entsprechend dem lateinischen Minuskel <b>'b'</b>.
+                        In den Akten der Forschungsstelle ist dies als <b>Chiffren-Knoten II</b> verzeichnet.
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-title">
+                            LOGBUCH-EINTRAG 03 // 29. SEPTEMBER 1937 // DR. ALBRECHT WEBER
+                        </div>
+                        Die geodaetische Triangulation der Ebene zeigt eine fatale Abweichung: Die Winkelsumme der Dreiecke
+                        uebersteigt 180 Grad! Die Wesen melden Panik in ihren Staedten — ihr Raum dehnt sich auf einer
+                        uebergeordneten Hypersphaere aus (Burger-Effekt). Der sphaerische Exzess waechst mit jedem Experiment.
+                    </div>
+
+                    <div class="log-item">
+                        <div class="log-title">
+                            LOGBUCH-EINTRAG 04 // 08. OKTOBER 1937 // DR. ERIKA LINDNER
+                        </div>
+                        Aufnahme kontinuierlicher Hochfrequenzpulse auf der 1420-MHz-Linie. Die planare Entitaet moduliert
+                        ihre Uebertragung im binaeren Takt der Sensor-Relais. Die spektrale Analyse zeigt deutliche
+                        Korrelationen mit den Messreihen unserer Harz-Station.
+                    </div>
+
+                    <div class="log-item" style="border-color: #800000; background: #fff5f5;">
+                        <div class="log-title" style="background: #800000; color: #ffffff;">
+                            LOGBUCH-EINTRAG 05 // 14. OKTOBER 1937 // DR. WEBER & DR. LINDNER (LETZTER EINTRAG)
+                        </div>
+                        Dringlichkeitsstufe Rot. Die zweidimensionale Trennflaeche droht die Kammerwand zu zerschneiden.
+                        Der Stollen wird evakuiert und mit Schnellzement versiegelt. Alle Dokumente und Kartierungen
+                        wurden in den Schutzschrank ueberfuehrt.
+                        <br><br>
+                        <i>Dr. Weber vermerkte vor dem Verlassen der Station:</i><br>
+                        "Die Steuer-Elektronik im Fundament laeuft ununterbrochen weiter... Wer an die Schalttafel gelangen
+                        will, muss die vordergruendige Schicht im System zur Seite schieben."
+                    </div>
+                </div>
+
+                <div id="sec-messprotokolle" class="content-box" style="display: none;">
+                    <div class="content-head">
+                        MESSPROTOKOLL DER HARZ-INTERFEROMETER-STATION (OKT. 1937)
+                    </div>
+                    <table class="raw-table">
+                        <tr>
+                            <th>PARAMETER</th>
+                            <th>MESSWERT</th>
+                            <th>BEWERTUNG</th>
+                        </tr>
+                        <tr>
+                            <td>Dicke der planaren Naht</td>
+                            <td>0,000000 Aengstroem</td>
+                            <td>Strikte Zweidimensionalitaet</td>
+                        </tr>
+                        <tr>
+                            <td>Sphaerischer Exzess Delta-01</td>
+                            <td>+19 Grad</td>
+                            <td>Raumkruemmung nach aussen (Burger)</td>
+                        </tr>
+                        <tr>
+                            <td>Interferenz-Linie III (Knoten 3)</td>
+                            <td>546,1 nm (Spektral-Vektor E)</td>
+                            <td><b>Chiffren-Knoten III: 'E'</b></td>
+                        </tr>
+                        <tr>
+                            <td>Wasserstofflinie (Träger)</td>
+                            <td>1420,405 MHz</td>
+                            <td>Interstellare H-I-Wasserstofflinie</td>
+                        </tr>
+                        <tr>
+                            <td>Koordinaten Portal</td>
+                            <td>51.80 N, 10.53 O</td>
+                            <td>Brocken-Plateau, Harz</td>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 15px; padding: 10px; border: 1px solid #7f9db9; background: #f0f4f8; font-size: 11px; line-height: 1.45;">
+                        <div style="font-weight: bold; color: #000080; margin-bottom: 5px;">
+                            SPEZIFIKATION DER 7-ELEMENT-SCHAUZEICHEN (DIN-NORM 1937):
+                        </div>
+                        Die Eingaberelais der Notfall-Schleuse sind nach dem klassischen 7-Segment-Muster verdrahtet:
+                        <div style="font-family: monospace; font-size: 11px; margin: 8px 0; color: #800000; white-space: pre;">
+     -- a --
+    |       |
+    f       b
+    |       |
+     -- g --
+    |       |
+    e       c
+    |       |
+     -- d --
+                        </div>
+                        Alphabetische Zeichen werden gemaess internationaler Schauzeichen-Praxis durch die entsprechenden
+                        aktiven Einzelsegmente (a bis g) modelliert (Gross- bzw. Kleinbuchstaben gemaess bester Lesbarkeit).
+                    </div>
+                </div>
+
+                <div id="sec-archivdateien" class="content-box" style="display: none;">
+                    <div class="content-head">
+                        VERSCHLUSSSACHEN-ARCHIV // DIGITALISIERTE BESTAENDE 1937
+                    </div>
+                    <div class="download-box">
+                        <div style="color: #000080; font-weight: bold; font-size: 13px; margin-bottom: 6px;">
+                            ARCHIVPAKET PLANUM-1937 (DIREKT-DOWNLOAD):
+                        </div>
+                        <a href="documents.zip" download="documents.zip" style="font-size: 13px; font-weight: bold; color: #0000cc; text-decoration: underline;">
+                            [ DOWNLOAD: documents.zip // ARCHIVBESTAND 1937 // 3.4 MB ]
+                        </a>
+                        <div style="font-size: 11px; color: #555555; margin-top: 6px;">
+                            (Enthaelt den hochaufloesenden geodaetischen Original-Plan von 1937 sowie das Spielleiter-Dossier.)
+                        </div>
+                    </div>
+                </div>
+
+                <div id="sec-vorschriften" class="content-box" style="display: none;">
+                    <div class="content-head">
+                        DIENSTANWEISUNG ZUR GEHEIMHALTUNG (STAATSSCHUTZ)
+                    </div>
+                    <p style="font-size: 13px; line-height: 1.5; color: #000000;">
+                        Jede unbefugte Weitergabe von Erkenntnissen ueber die zweite Dimension, die planare Scherkraft
+                        oder die Koordinaten der Versuchsstation im Harz wird als Landesverrat nach Paragraph 88 des
+                        Reichsstrafgesetzbuches mit dem Tode geahndet.
+                    </p>
+                    
+                    <div style="margin: 15px 0; padding: 10px; background: #ffffd8; border: 1px solid #b8a800; font-size: 12px; line-height: 1.45;">
+                        <div style="font-weight: bold; color: #665500; margin-bottom: 4px;">
+                            PARAGRAPH 5: ABSCHLUSS DER VERIFIKATIONS-KETTE (NOTFALL-ARRETIERUNG)
+                        </div>
+                        Bei drohendem Durchbruch der Schnittflaeche in den dreidimensionalen Raum ist die fuenfte und
+                        letzte Schaltstufe zwingend auf die Endstufen-Glyphe <b>'E'</b> (Abschluss der fuenfgliedrigen
+                        Chiffrenkette E-B-E-N-E) zu arretieren, um die Sicherheitsschleuse des Bunkers freizuschalten.
+                    </div>
+
+                    <p style="font-size: 13px; line-height: 1.5; color: #000000;">
+                        Die Original-Karten und Protokolle sind im Notfall zu sichern. Das Passwort zur Relais-Sperre
+                        darf nur in getrennten Komponenten an die leitenden Forscher uebermittelt werden.
+                    </p>
+                    <div style="margin-top: 15px; padding: 10px; background: #e0e0e0; border: 1px solid #808080; font-size: 11px;">
+                        Gez. Forschungsrat fuer Raumkruemmung, Berlin / Harz, 14. Oktober 1937.<br>
+                        Aktenzeichen: RFR-1884-PL-37 // EXTREM VERTRAULICH
+                    </div>
+                </div>
+
+            </td>
+        </tr>
+    </table>
+
+    <div style="border-top: 1px solid #808080; margin-top: 10px; padding: 6px; font-size: 11px; color: #555555; text-align: center;">
+        REICHSFORSCHUNGSRAT (1937) // ZENTRALSTELLE GOETTINGEN // VERSUCHSSTATION HARZ-BROCKEN II
+    </div>
+</div>
+
+<div id="screamer-modal">
+    <div id="screamer-window">
+        <div style="background: #800000; color: #ffffff; padding: 3px 6px; font-size: 12px; font-weight: bold; display: flex; justify-content: space-between;">
+            <span>SENSOR-FEED: TIEFENSTOLLEN BROCKEN II</span>
+            <span onclick="closeScreamerModal()" style="cursor: pointer;">[X]</span>
+        </div>
+        <div style="padding: 10px; background: #000000;">
+            <div id="screamer-canvas">
+                <canvas id="webcam-cv" width="560" height="360" style="width: 100%; height: 100%;"></canvas>
+                <div style="position: absolute; top: 10px; left: 10px; color: #00ff00; font-family: monospace; font-size: 11px;">
+                    LIVE-SIGNAL • TIEFENSTOLLEN HARZ<br>
+                    IDENTIFIZIERT: DR. ALBRECHT WEBER (1937)
+                </div>
+            </div>
+            <div style="margin-top: 8px; display: flex; justify-content: space-between; align-items: center;">
+                <span id="cam-status" style="font-family: monospace; font-size: 11px; color: #888888;">
+                    TELEMETRIE KANAL IV // MODULATION: 'n' (1420.4 MHz) // [FRAME 04/10]
+                </span>
+                <button onclick="triggerJumpscareNow()" style="padding: 4px 10px; font-family: Arial; font-size: 11px; font-weight: bold; background: #c0c0c0; border: 2px outset #ffffff; cursor: pointer;">
+                    [ FILTER KALIBRIEREN ]
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="jumpscare-fullscreen">
+    <img id="screamer-img" src="weber_screamer.png" style="width: 100vw; height: 100vh; object-fit: cover;">
+    <div class="scary-text">
+        SIE HABEN KEINE DICKE.<br>
+        <span style="font-size: 28px; color: #ffffff;">DER SCHNITT DURCHTRENNT DEN RAUM.</span>
+    </div>
+</div>
+
+<script>
+function showPublicSection(secId) {
+    const list = ['uebersicht', 'logbuecher', 'messprotokolle', 'archivdateien', 'vorschriften'];
+    list.forEach(s => {
+        const el = document.getElementById('sec-' + s);
+        if (el) el.style.display = (s === secId) ? 'block' : 'none';
+    });
+}
+
+const digitsState = [
+    { a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+    { a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+    { a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+    { a:0, b:0, c:0, d:0, e:0, f:0, g:0 },
+    { a:0, b:0, c:0, d:0, e:0, f:0, g:0 }
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+    for (let i = 0; i < 5; i++) {
+        const disp = document.getElementById('seg-display-' + i);
+        if (!disp) continue;
+        const segs = disp.querySelectorAll('.seg');
+        segs.forEach(s => {
+            s.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const segName = s.getAttribute('data-seg');
+                digitsState[i][segName] = digitsState[i][segName] ? 0 : 1;
+                updateDigitDisplay(i);
+                playClickSound();
+            });
+        });
+    }
+    loadWebcamImage();
+});
+
+function updateDigitDisplay(idx) {
+    const disp = document.getElementById('seg-display-' + idx);
+    const state = digitsState[idx];
+
+    ['a','b','c','d','e','f','g'].forEach(seg => {
+        const segEl = disp.querySelector('.seg-' + seg);
+        if (state[seg]) {
+            segEl.classList.add('on');
+        } else {
+            segEl.classList.remove('on');
+        }
+    });
+
+    const box = document.getElementById('lock-status-box');
+    if (box && box.classList.contains('status-error')) {
+        box.className = 'status-box status-idle';
+        box.innerText = '[ SYSTEM-STATUS: BEREIT // 5 SEGMENT-FELDER ERFORDERLICH ]';
+    }
+}
+
+function resetAllSegments() {
+    for (let i = 0; i < 5; i++) {
+        ['a','b','c','d','e','f','g'].forEach(s => digitsState[i][s] = 0);
+        updateDigitDisplay(i);
+    }
+    const box = document.getElementById('lock-status-box');
+    if (box) {
+        box.className = 'status-box status-idle';
+        box.innerText = '[ SYSTEM-STATUS: ZURUECKGESETZT // ALLE FELDER AUS ]';
+    }
+}
+
+const _V_H_S = "6127ae2b0bfd539d952d3433798dea419951fb7825d3e9fc480efa1c91697212";
+const _V_H_E = "a8996f2a404f13f9146821871856c2ec0daee1a8bf5a71db4b6701995757044f";
+const _ENC_S = "5d43c75d2b8e27e4f94809111be29825fc23c15817a391dc3b619675f54951225141c81b3bc673edf449505a17ead061ab618b001ef38b9d2b659d6efe1c1c765b078d1b3ecc66ada016145e18ff8d28f77c8f1755e9c9cf787e8227b357782e054ed80b78892af1f010165016e18533a371d84815b58fcc7835da7afe07063f124ed44e31dd62a5e5550f131fe28435b4269e1142bb9dc6686c9570f55252700e55ca4e79d031f2e1595b5e43addb31e171881749ba8ddc6b3eca7af75942294157cf4f6f943dfab84f5b470de2877bb9698b001ef3849d3a699372bc0b1d661548c3112bcc66eded16160d73dbaf13d017b2336487a0b3062ebf4ed7263e553362e76843dd7cb2b56b667630caab03dc71bf3d77f3aeb9004bb351d022265741e5057b47bc1dc8d800050a4aba28fa936dd41c4ca5d7f6747eda6fe5101e775c05cd44679221a7b50e52551feb8c27a2719d174ba7c48f21749f26b1584162191c8e47629336b0fd485d5411f9d061a87fce4307ede3b8216bda4ef405137b124ccb5f7f9873eae05f505659ef8f32ed309e0c4cb49dd2684a9379b13f17601244c6477e8e20eef44e5c5659e98f33b917940a56b081892669896fe50c1e7e0407e64a798773b5a4191a1336e69e2efb34895814eadacb612e936fe5491460044ec94e789e3bfcf95951475787d66ee96ff14441ba9fdc3b7a8370f454507f0055c94265c773aca05d4c1349b6ca31f8359f114bb4d3dc793c8a64aa491073024cc95964883df9af0d170349bdda71a96adb1a4aa18d993a34da2de11152760054c64e6fdd70ada54b520349b6c87f936d9f1153f39a8831629f21b30a1d7e0e55940b289b35fbf31d040859eb852fed7c8c1d4cb48188722e9873fd0d49320748c05f268e3ae7f01714024bfd927ab93c9a0a42ba87d12a618e68fe0448325757d61029c359d6da60647f3cd9be04ca71ad3d7780aab4045ba94fc228315a2469836a59be1bd4c3173e0f56e98337a75bc71905bb9b992e33d878fe0a077f0449da5825873aedb70d505c0ee3862ef835c65a41bc8a89256b9468e247087b11058e587f843ff8a80f575c15e2987bb972cb4843b5d9cc732e9c73ff1d5f65044ec9437fc773fffa41500859f98f39ed7c9f1d46bc9b9d3c679572ab49077c0542dc47629336a6b54b5b5d0da09928e334c15814e09984732cc416ca49365d3669e2644ab969bdf142574614e88435ea7f811155f3c6d36858b550dd3a26532469ea624cb801bdd47f777b30dba804ca05ba3661f3d8c57b39da419b555d735f2d92046f9425a39f11505a0fad9935e03d9e4507b08690277cc03cb259427407179e102b9b3cf3e100435610ea8235a371991749b7d2dc256f887bf8075f660e57940b39cd23e5ae0d525c17f9c732f02b9e4205e2dd8c3035d8229b26205b266ee06a47d017d2de78797637d9ca05dc03db3e6a81babf005bb45bc22e20473177eb0b23cc67b3b5627f6736cfaf13b960c24b12fad3f674219e75e757782e054ed80b78892af1f01016471cf59e6cf83d921f4be9c99f2d608e79e352527f0055c94265c773aca05d4c1349b6c87f936d9a584da18c9a752c9b6ef63602671b5dc24e548d3ffcfb58591d09e38d63b9259a0a42b69dc16a519870f00719305f2d9242669a73eee74e091118ff8d1ee924810249b6b68c246f9469fc47027c06058e4a67896ebfd2485c5610e08b2aed34db2849b28789252ecb25a25e50321253d7476ec071f0f455194410e99e29a371c24800e8c99e277c9e79e3535220115f8e5864913af9b50e04031febda71a273c57219fc88c24232d578f81f4c185d08ca427dc3";
+const _ENC_E = "94fd065c603c6780780d1ca57a39b08868dcdb888d2a09fb38086df03377277f98ff091a70743389750c45ee7631f8cc3f9e91d0847a13ba280c66eb38226a2b92b94c1a757e26c9215301ea7924a585638395c7cf6051e87b1779a275690e73ccf0190a333b6a95715503e4773aad9e378ec2988f3c17eb7b5c21ff38397062dbf0154f7a6f22c164101aa77e39ac9820d984c1d83205e16b056ef5336c242dc7eb0b4f32627196601c4eea2276f39c758e92c7d33315fb685731ff3167347488e90e4e24267d9e390a4ef36c39afd62d9691d0847a1cba390068f77a356b3bdcf60210607e26896c5303b9120087be44e8a8e3fe0e3894054744cb11184808fadc2669086f3cd6342e73c2511183ae488ea5eded7a369e032248d4161c500a885bc47a0c0e5dac594510be2b6100570792ceccd62c4fd1771721ea232e682a95bb0c452c2061c3344b47e17e30a48a368e87c7d12e5ca8221d64a37766373fd0a24f46292176d47c0d48e07022f8cc3c80d4939d647b9f220221cb323b6526dbf20a5e342a338e611a45e23834a79f79cf84dcd63d05f56b2368fc7701613ddbfa0746353c608a750b49e23832a79e2de88edacc3919ae250072ea23326823cdb9274b323533d1255c0fa7573db6836fcb93888e6342ec624768ea2377623dcdf0084f332c7b98781c44f3365cfec37d90eb94db3307fb381378f5326a2622c9eb08432e7533c8211859a7286de29c6cca85c1d13d4bfb7a5571e16c77662ecbf208582f3a7d9d2e4802b72866f2dc3d95c1cad02815be395d21a8272f242bc9ea074f246f30c9240e47b7286de0d2079285c1c97a02af320b64a475346b23c7eb550a6329759f725811bc3830ad82798396cdd63d19af714763f63b333f6fcef6015e6d3c7a83715201b62a26bad72dc380dad8331ff6290875ed383a3e6f9ee91711627119b25b2571cb5d0296a95e8eb7eded093293073252ca04164707edd7426b120c5bb042522bbb3732ab9a33a4ddc99f3203be2d5a23fd38347122cdf71b596e357a89364845e86f38ae836ccadc8adb3512ae26026fed24797e26d8bb4f5934367f9c294a42e87439b0d62d8dd198d93c41eb704767f639232938cdf008423475339b7b0445bc3822a794798385cddc3503ba3f0e6ef76d777121ccfc1d46292176c2340e4ee96c7bb18577cbdb888e6901a370453f930c774000ffd72365010b29d9700742f27533ac987e809bc1cf7a5ef46b314ed51b04500eedd72b63070a41d9553a62cf510080a95efaa0e6fb7a40e2785021c45d6b2b2e96935305242665c71e5445ee6e76b19874c284959d391eb724153bb974673429cea95f1160297c97604556e27131aa98378e83c7d33e4afb260673fe3e39293bc7e9550a727f63812f4847e87622ef9f64d484929f6b45ab335c23a75d185606efd0216b0c6257b65f3d6cc25602e2a848fcc1eef008229803324fde0410561af8c92a0a687e27d734276ad3571487be2d9fd89b88734bd1774865f021690e73ccf0190a333b6a95715503f37d2eb6c16cc288cfd16051b82e0975fc256c2422c9eb08432e7533c8211859a7286de0d207928088d72814bd764560eb3008743ad2e3034f1f3f7f987a1d4ca96838a5ce2dda80dad83f05e6693863f536396f6d969353432d28338a660b1ca57924a5b37ddb9bd2d33f2eab27066fec3a797421cfbb4f4b2c3b2edb530d49e2713ba38779cbc1f8d33b1fae264730a06460266fdbed16462572319475100cf07132b684378ed8989a6151b9241565fc256d247dd8e14f592f237a9d344b11b77e30f2dc368cdfa2837510e5415b2efd3e213a4594b60b433671";
+
+function _sha256(str) {
+    const buffer = new TextEncoder().encode(str);
+    return crypto.subtle.digest("SHA-256", buffer).then(hash => {
+        return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+    });
+}
+
+function _decrypt(hexStr, keyBytes) {
+    const bytes = [];
+    for (let i = 0; i < hexStr.length; i += 2) {
+        bytes.push(parseInt(hexStr.substr(i, 2), 16));
+    }
+    const dec = [];
+    for (let i = 0; i < bytes.length; i++) {
+        dec.push(bytes[i] ^ keyBytes[i % keyBytes.length]);
+    }
+    return new TextDecoder().decode(new Uint8Array(dec));
+}
+
+function checkLockCode() {
+    let bits = "";
+    for (let i = 0; i < 5; i++) {
+        ['a','b','c','d','e','f','g'].forEach(s => {
+            bits += (digitsState[i][s] ? "1" : "0");
+        });
+    }
+
+    _sha256(bits).then(h => {
+        const box = document.getElementById('lock-status-box');
+        if (h === _V_H_S || h === _V_H_E) {
+            const keyEnc = new TextEncoder().encode(bits);
+            crypto.subtle.digest("SHA-256", keyEnc).then(kh => {
+                const keyBytes = new Uint8Array(kh);
+                const encData = (h === _V_H_S) ? _ENC_S : _ENC_E;
+                const htmlOut = _decrypt(encData, keyBytes);
+                
+                playAccessGrantedSound();
+                if (box) {
+                    box.className = 'status-box status-success';
+                    box.innerText = '[ VERIFIKATION ERFOLGREICH // KODEX BESTAETIGT // SCHLEUSE FREIGEGEBEN ]';
+                }
+                const archive = document.getElementById('unlocked-archive');
+                if (archive) {
+                    archive.innerHTML = htmlOut;
+                    archive.style.display = 'block';
+                    setTimeout(() => {
+                        archive.scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                }
+            });
+        } else {
+            playAccessDeniedSound();
+            if (box) {
+                box.className = 'status-box status-error';
+                box.innerText = '[ FEHLER: DIE EINGEGEBENE 7-SEGMENT-MATRIX IST UNGUELTIG // PRUEFUNG FEHLGESCHLAGEN ]';
+            }
+        }
+    });
+}
+
+let audioCtx = null;
+function getAudioContext() {
+    if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    return audioCtx;
+}
+
+function playClickSound() {
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(800, ctx.currentTime);
+        gain.gain.setValueAtTime(0.08, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.04);
+    } catch(e) {}
+}
+
+function playAccessGrantedSound() {
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+}
+
+function playAccessDeniedSound() {
+    try {
+        const ctx = getAudioContext();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(140, ctx.currentTime);
+        osc.frequency.setValueAtTime(105, ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.35);
+    } catch(e) {}
+}
+
+let webcamImg = new Image();
+function loadWebcamImage() {
+    webcamImg.src = 'weber_portrait.png';
+}
+
+let webcamTimer = null;
+let screamerTimeout = null;
+
+function openScreamerModal() {
+    document.getElementById('screamer-modal').style.display = 'flex';
+    initWebcamNoise();
+    screamerTimeout = setTimeout(() => {
+        triggerJumpscareNow();
+    }, 4200);
+}
+
+function closeScreamerModal() {
+    document.getElementById('screamer-modal').style.display = 'none';
+    if (screamerTimeout) clearTimeout(screamerTimeout);
+    if (webcamTimer) clearInterval(webcamTimer);
+}
+
+function initWebcamNoise() {
+    const cv = document.getElementById('webcam-cv');
+    const ctx = cv.getContext('2d');
+    
+    webcamTimer = setInterval(() => {
+        ctx.fillStyle = '#060a0e';
+        ctx.fillRect(0, 0, cv.width, cv.height);
+
+        if (webcamImg.complete && webcamImg.naturalWidth > 0) {
+            ctx.filter = 'grayscale(100%) contrast(140%) brightness(80%)';
+            ctx.drawImage(webcamImg, 0, 0, cv.width, cv.height);
+            ctx.filter = 'none';
+        }
+
+        const imgData = ctx.createImageData(cv.width, cv.height);
+        const buffer = new Uint32Array(imgData.data.buffer);
+        for (let i = 0; i < buffer.length; i++) {
+            if (Math.random() < 0.2) {
+                const gray = Math.floor(Math.random() * 80);
+                buffer[i] = (255 << 24) | (gray << 16) | (gray << 8) | gray;
+            }
+        }
+        const noiseCv = document.createElement('canvas');
+        noiseCv.width = cv.width;
+        noiseCv.height = cv.height;
+        noiseCv.getContext('2d').putImageData(imgData, 0, 0);
+        ctx.globalAlpha = 0.35;
+        ctx.drawImage(noiseCv, 0, 0);
+        ctx.globalAlpha = 1.0;
+
+        ctx.strokeStyle = '#ff3333';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(180, 50, 200, 260);
+
+        ctx.fillStyle = '#33ff66';
+        ctx.font = '11px monospace';
+        ctx.fillText('STATION BROCKEN II // CHIFFREN-KNOTEN IV: [ n ] // 14-OKT-1937', 20, cv.height - 20);
+    }, 120);
+}
+
+function triggerJumpscareNow() {
+    if (screamerTimeout) clearTimeout(screamerTimeout);
+    if (webcamTimer) clearInterval(webcamTimer);
+    document.getElementById('screamer-modal').style.display = 'none';
+
+    const jumpscareEl = document.getElementById('jumpscare-fullscreen');
+    jumpscareEl.style.display = 'block';
+    jumpscareEl.classList.add('shaking');
+
+    playHorrorScreech();
+
+    setTimeout(() => {
+        jumpscareEl.classList.remove('shaking');
+        jumpscareEl.style.display = 'none';
+        const box = document.getElementById('cam-status');
+        if (box) box.innerText = 'FEHLER: SENSOR-UEBERLASTUNG // VERBINDUNG GETRENNT';
+    }, 2600);
+}
+
+function playHorrorScreech() {
+    try {
+        const ctx = getAudioContext();
+        const duration = 2.4;
+
+        const bufferSize = ctx.sampleRate * duration;
+        const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+        const output = noiseBuffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            output[i] = Math.random() * 2 - 1;
+        }
+        const whiteNoise = ctx.createBufferSource();
+        whiteNoise.buffer = noiseBuffer;
+
+        const noiseFilter = ctx.createBiquadFilter();
+        noiseFilter.type = 'bandpass';
+        noiseFilter.frequency.setValueAtTime(2600, ctx.currentTime);
+        noiseFilter.Q.setValueAtTime(2, ctx.currentTime);
+
+        const noiseGain = ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.75, ctx.currentTime);
+        noiseGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+        whiteNoise.connect(noiseFilter);
+        noiseFilter.connect(noiseGain);
+        noiseGain.connect(ctx.destination);
+        whiteNoise.start();
+
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const oscGain = ctx.createGain();
+
+        osc1.type = 'sawtooth';
+        osc2.type = 'square';
+
+        osc1.frequency.setValueAtTime(3400, ctx.currentTime);
+        osc1.frequency.linearRampToValueAtTime(4900, ctx.currentTime + 0.3);
+        osc1.frequency.linearRampToValueAtTime(1900, ctx.currentTime + duration);
+
+        osc2.frequency.setValueAtTime(1700, ctx.currentTime);
+        osc2.frequency.linearRampToValueAtTime(3600, ctx.currentTime + 0.4);
+
+        oscGain.gain.setValueAtTime(0.85, ctx.currentTime);
+        oscGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+
+        osc1.connect(oscGain);
+        osc2.connect(oscGain);
+        oscGain.connect(ctx.destination);
+
+        osc1.start();
+        osc2.start();
+        osc1.stop(ctx.currentTime + duration);
+        osc2.stop(ctx.currentTime + duration);
+    } catch(e) {}
+}
+</script>
+</body>
+</html>
