@@ -377,6 +377,7 @@ body {
                 <div class="seg seg-f" data-seg="f"></div>
                 <div class="seg seg-g" data-seg="g"></div>
             </div>
+            <div id="seg-char-0" style="color: #444444; font-family: monospace; font-size: 15px; font-weight: bold; margin-top: 6px;">[ - ]</div>
         </div>
 
         <div class="digit-wrapper">
@@ -390,6 +391,7 @@ body {
                 <div class="seg seg-f" data-seg="f"></div>
                 <div class="seg seg-g" data-seg="g"></div>
             </div>
+            <div id="seg-char-1" style="color: #444444; font-family: monospace; font-size: 15px; font-weight: bold; margin-top: 6px;">[ - ]</div>
         </div>
 
         <div class="digit-wrapper">
@@ -403,6 +405,7 @@ body {
                 <div class="seg seg-f" data-seg="f"></div>
                 <div class="seg seg-g" data-seg="g"></div>
             </div>
+            <div id="seg-char-2" style="color: #444444; font-family: monospace; font-size: 15px; font-weight: bold; margin-top: 6px;">[ - ]</div>
         </div>
 
         <div class="digit-wrapper">
@@ -416,6 +419,7 @@ body {
                 <div class="seg seg-f" data-seg="f"></div>
                 <div class="seg seg-g" data-seg="g"></div>
             </div>
+            <div id="seg-char-3" style="color: #444444; font-family: monospace; font-size: 15px; font-weight: bold; margin-top: 6px;">[ - ]</div>
         </div>
 
         <div class="digit-wrapper">
@@ -429,6 +433,7 @@ body {
                 <div class="seg seg-f" data-seg="f"></div>
                 <div class="seg seg-g" data-seg="g"></div>
             </div>
+            <div id="seg-char-4" style="color: #444444; font-family: monospace; font-size: 15px; font-weight: bold; margin-top: 6px;">[ - ]</div>
         </div>
     </div>
 
@@ -442,6 +447,9 @@ body {
         </button>
         <button onclick="resetAllSegments()" style="background: #330000; color: #ff6666; border: 2px outset #ff6666; padding: 10px 18px; font-family: monospace; font-size: 13px; margin-left: 12px; cursor: pointer;">
             [ NULLSTELLUNG ]
+        </button>
+        <button onclick="loadCalibrationEbene()" style="background: #002244; color: #66ccff; border: 2px outset #66ccff; padding: 10px 18px; font-family: monospace; font-size: 13px; margin-left: 12px; cursor: pointer;">
+            [ EICHUNG: EBENE ]
         </button>
     </div>
 
@@ -807,6 +815,35 @@ document.addEventListener('DOMContentLoaded', () => {
     loadWebcamImage();
 });
 
+function decode7SegDigit(state) {
+    const a = state.a ? 1 : 0;
+    const b = state.b ? 1 : 0;
+    const c = state.c ? 1 : 0;
+    const d = state.d ? 1 : 0;
+    const e = state.e ? 1 : 0;
+    const f = state.f ? 1 : 0;
+    const g = state.g ? 1 : 0;
+
+    if (a && d && e && f && g && !b && !c) return 'E';
+    if (a && b && d && e && f && g && !c) return 'E';
+    if (c && d && e && f && g && !b) return 'b';
+    if (a && b && c && d && g && !e && !f) return 'b';
+    if (a && b && c && d && e && f && g) return 'b';
+    if (c && e && g && !a && !b && !d && !f) return 'n';
+    if (a && b && c && e && f && !d && !g) return 'n';
+    if (c && d && e && g && !a && !b && !f) return 'n';
+    if (a && c && e && !b && !d && !f && !g) return 'n';
+
+    if (a && c && d && f && g && !b && !e) return 'S';
+    if (a && b && e && f && g && !c && !d) return 'P';
+    if (b && c && e && f && g && !a && !d) return 'H';
+    if (c && e && f && g && !a && !b && !d) return 'H';
+    if (e && g && !a && !b && !c && !d && !f) return 'r';
+    if (a && e && f && !b && !c && !d && !g) return 'r';
+
+    return '-';
+}
+
 function updateDigitDisplay(idx) {
     const disp = document.getElementById('seg-display-' + idx);
     const state = digitsState[idx];
@@ -820,10 +857,32 @@ function updateDigitDisplay(idx) {
         }
     });
 
+    const charEl = document.getElementById('seg-char-' + idx);
+    if (charEl) {
+        const ch = decode7SegDigit(state);
+        charEl.innerText = '[ ' + ch + ' ]';
+        charEl.style.color = (ch !== '-') ? '#00ff00' : '#444444';
+    }
+
     const box = document.getElementById('lock-status-box');
     if (box && box.classList.contains('status-error')) {
         box.className = 'status-box status-idle';
         box.innerText = '[ SYSTEM-STATUS: BEREIT // 5 SEGMENT-FELDER ERFORDERLICH ]';
+    }
+}
+
+function loadCalibrationEbene() {
+    digitsState[0] = { a:1, b:0, c:0, d:1, e:1, f:1, g:1 };
+    digitsState[1] = { a:0, b:0, c:1, d:1, e:1, f:1, g:1 };
+    digitsState[2] = { a:1, b:0, c:0, d:1, e:1, f:1, g:1 };
+    digitsState[3] = { a:0, b:0, c:1, d:0, e:1, f:0, g:1 };
+    digitsState[4] = { a:1, b:0, c:0, d:1, e:1, f:1, g:1 };
+    for (let i = 0; i < 5; i++) updateDigitDisplay(i);
+    playClickSound();
+    const box = document.getElementById('lock-status-box');
+    if (box) {
+        box.className = 'status-box status-idle';
+        box.innerText = '[ EICHUNG: RELAIS AUF KODEX «E - b - E - n - E» ARRETIERT ]';
     }
 }
 
@@ -864,6 +923,14 @@ function _decrypt(hexStr, keyBytes) {
 }
 
 function checkLockCode() {
+    let word = "";
+    for (let i = 0; i < 5; i++) {
+        word += decode7SegDigit(digitsState[i]).toUpperCase();
+    }
+
+    let isEbene = (word === "EBENE");
+    let isSpher = (word === "SPHER");
+
     let bits = "";
     for (let i = 0; i < 5; i++) {
         ['a','b','c','d','e','f','g'].forEach(s => {
@@ -872,14 +939,18 @@ function checkLockCode() {
     }
 
     _sha256(bits).then(h => {
+        if (h === _V_H_S) isSpher = true;
+        if (h === _V_H_E) isEbene = true;
+
         const box = document.getElementById('lock-status-box');
-        if (h === _V_H_S || h === _V_H_E) {
-            const keyEnc = new TextEncoder().encode(bits);
+        if (isEbene || isSpher) {
+            const canonicalBits = isEbene ? "10011110011111100111100101011001111" : "10110111100111011011110011110000101";
+            const keyEnc = new TextEncoder().encode(canonicalBits);
             crypto.subtle.digest("SHA-256", keyEnc).then(kh => {
                 const keyBytes = new Uint8Array(kh);
-                const encData = (h === _V_H_S) ? _ENC_S : _ENC_E;
+                const encData = isEbene ? _ENC_E : _ENC_S;
                 const htmlOut = _decrypt(encData, keyBytes);
-                
+
                 playAccessGrantedSound();
                 if (box) {
                     box.className = 'status-box status-success';
